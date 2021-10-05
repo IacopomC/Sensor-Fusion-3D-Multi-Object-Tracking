@@ -118,7 +118,6 @@ The final project uses pre-computed lidar detections in order for all students t
 
 ## External Dependencies
 Parts of this project are based on the following repositories:
-https://github.com/udacity/nd013-c2-fusion-starter
 - [Udacity Self-Driving Car Engineer Nanodegree Program: Sensor Fusion and Tracking Project](https://github.com/udacity/nd013-c2-fusion-starter)
 - [Simple Waymo Open Dataset Reader](https://github.com/gdlg/simple-waymo-open-dataset-reader)
 - [Super Fast and Accurate 3D Object Detection based on 3D LiDAR Point Clouds](https://github.com/maudzung/SFA3D)
