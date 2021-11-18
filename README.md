@@ -114,7 +114,7 @@ In case you do not include a specific step into the list, pre-computed binary fi
 
 Even without solving any of the tasks, the project code can be executed.
 
-The final project uses pre-computed lidar detections in order for all students to have the same input data. If you use the workspace, the data is prepared there already. Otherwise, [download the pre-computed lidar detections](https://drive.google.com/drive/folders/1IkqFGYTF6Fh_d8J3UjQOSNJ2V42UDZpO?usp=sharing) (~1 GB), unzip them and put them in the folder `results`.
+The project uses pre-computed lidar detections. [Download](https://drive.google.com/drive/folders/1IkqFGYTF6Fh_d8J3UjQOSNJ2V42UDZpO?usp=sharing) them (~1 GB), unzip them and put them in the folder `results`.
 
 ## External Dependencies
 Parts of this project are based on the following repositories:
