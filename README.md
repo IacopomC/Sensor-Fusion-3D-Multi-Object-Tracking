@@ -2,8 +2,6 @@
 # **3D Multi-Object Tracking**
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
-This repository contains my implementation of the open source project [Sensor Fusion and Tracking](https://github.com/udacity/nd013-c2-fusion-starter) part of the [Udacity - Self-Driving Car NanoDegree](http://www.udacity.com/drive).
-
 In this project, measurements from LiDAR and camera are fused to track vehicles over time using the Waymo Open Dataset.
 
 The project consists of two major parts:
