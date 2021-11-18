@@ -9,3 +9,4 @@ wxpython
 shapely
 tqdm
 open3d
+scipy
