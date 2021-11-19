@@ -77,8 +77,18 @@ def show_range_image(frame, lidar_name):
     return img_range_intensity
 
 
-# create birds-eye view of lidar data
 def bev_from_pcl(lidar_pcl, configs):
+    """
+    Create birds-eye view of lidar data.
+
+    Parameters:
+    lidar_pcl (2D numpy array): lidar point cloud which is to be converted
+    configs (edict): dictionary containing config info
+
+    Returns:
+    input_bev_maps ():
+
+    """
 
     # remove lidar points outside detection area and with too low reflectivity
     mask = np.where((lidar_pcl[:, 0] >= configs.lim_x[0]) & (lidar_pcl[:, 0] <= configs.lim_x[1]) &
@@ -90,11 +100,10 @@ def bev_from_pcl(lidar_pcl, configs):
     lidar_pcl[:, 2] = lidar_pcl[:, 2] - configs.lim_z[0]  
 
     # convert sensor coordinates to bev-map coordinates (center is bottom-middle)
-    ####### ID_S2_EX1 START #######     
-    #######
-    print("student task ID_S2_EX1")
+    print("Convert sensor coordinates to bev-map coordinates")
 
     ## step 1 :  compute bev-map discretization by dividing x-range by the bev-image height (see configs)
+    configs.bev_height
 
     ## step 2 : create a copy of the lidar pcl and transform all metrix x-coordinates into bev-image coordinates    
 
