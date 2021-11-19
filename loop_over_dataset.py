@@ -78,12 +78,13 @@ lidar = None # init lidar sensor object
 camera = None # init camera sensor object
 np.random.seed(10) # make random values predictable
 
-## Selective execution and visualization
-exec_detection = [] # options are 'bev_from_pcl', 'detect_objects', 'validate_object_labels', 'measure_detection_performance'; options not in the list will be loaded from file
-exec_tracking = [] # options are 'perform_tracking'
-exec_visualization = [] # options are 'show_range_image', 'show_bev', 'show_pcl', 'show_labels_in_image', 'show_objects_and_labels_in_bev', 'show_objects_in_bev_labels_in_camera', 'show_tracks', 'show_detection_performance', 'make_tracking_movie'
+## Selective execution and visualization; options not in the list will be loaded from file
+exec_data = ['load_image' 'pcl_from_rangeimage']  # options are 'load_image','pcl_from_rangeimage'
+exec_detection = []  # options are 'bev_from_pcl', 'detect_objects', 'validate_object_labels', 'measure_detection_performance'
+exec_tracking = []  # options are 'perform_tracking'
+exec_visualization = []  # options are 'show_range_image', 'show_bev', 'show_pcl', 'show_labels_in_image', 'show_objects_and_labels_in_bev', 'show_objects_in_bev_labels_in_camera', 'show_tracks', 'show_detection_performance', 'make_tracking_movie'
 exec_list = make_exec_list(exec_detection, exec_tracking, exec_visualization)
-vis_pause_time = 0 # set pause time between frames in ms (0 = stop between frames until key is pressed)
+vis_pause_time = 0  # set pause time between frames in ms (0 = stop between frames until key is pressed)
 
 
 ##################
@@ -121,7 +122,7 @@ while True:
         if 'load_image' in exec_list:
             image = tools.extract_front_camera_image(frame) 
 
-        ## Compute lidar point-cloud from range image    
+        ## Compute lidar point-cloud from range image
         if 'pcl_from_rangeimage' in exec_list:
             print('computing point-cloud from lidar range image')
             lidar_pcl = tools.pcl_from_range_image(frame, lidar_name)
