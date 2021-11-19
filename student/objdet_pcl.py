@@ -33,9 +33,7 @@ import misc.objdet_tools as tools
 # visualize lidar point-cloud
 def show_pcl(pcl):
 
-    ####### ID_S1_EX2 START #######     
-    #######
-    print("student task ID_S1_EX2")
+    print("Visualize lidar point-cloud")
 
     # step 1 : initialize open3d with key callback and create window
     
@@ -80,6 +78,7 @@ def show_range_image(frame, lidar_name):
 def bev_from_pcl(lidar_pcl, configs):
     """
     Create birds-eye view of lidar data.
+    Ref http://ronny.rest/tutorials/module/pointclouds_01/point_cloud_birdseye/
 
     Parameters:
     lidar_pcl (2D numpy array): lidar point cloud which is to be converted (point = [x y z r])
