@@ -82,7 +82,7 @@ def bev_from_pcl(lidar_pcl, configs):
     Create birds-eye view of lidar data.
 
     Parameters:
-    lidar_pcl (2D numpy array): lidar point cloud which is to be converted
+    lidar_pcl (2D numpy array): lidar point cloud which is to be converted (point = [x y z r])
     configs (edict): dictionary containing config info
 
     Returns:
@@ -103,17 +103,18 @@ def bev_from_pcl(lidar_pcl, configs):
     print("Convert sensor coordinates to bev-map coordinates")
 
     ## step 1 :  compute bev-map discretization by dividing x-range by the bev-image height (see configs)
-    configs.bev_height
+    lidar_pcl[:, 0] /= configs.bev_height
 
-    ## step 2 : create a copy of the lidar pcl and transform all metrix x-coordinates into bev-image coordinates    
+    ## step 2 : create a copy of the lidar pcl and transform all metrix x-coordinates into bev-image coordinates
+    bev_pcl = lidar_pcl.copy()
+    bev_pcl[:, 1] = - lidar_pcl[:, 0] / configs.bev_height + configs.bev_height
 
     # step 3 : perform the same operation as in step 2 for the y-coordinates but make sure that no negative bev-coordinates occur
+    bev_pcl[:, 0] = - lidar_pcl[:, 1] / configs.bev_width + configs.bev_width / 2
 
     # step 4 : visualize point-cloud using the function show_pcl from a previous task
-    
-    #######
-    ####### ID_S2_EX1 END #######     
-    
+    show_pcl(bev_pcl)
+
     
     # Compute intensity layer of the BEV map
     ####### ID_S2_EX2 START #######     
