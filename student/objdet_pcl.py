@@ -56,30 +56,47 @@ def show_pcl(pcl):
     vis.poll_events()
     vis.run()
 
-       
 
-# visualize range image
 def show_range_image(frame, lidar_name):
+    """
+    Visualize range image for each frame
+    Ref https://waymo.com/intl/en_us/dataset-data-format/
 
-    ####### ID_S1_EX1 START #######     
-    #######
-    print("student task ID_S1_EX1")
+    Parameters:
+    frame (tfrecord): current frame to visualize
+    lidar_name (int): integer corresponding to lidar name
 
-    # step 1 : extract lidar data and range image for the roof-mounted lidar
+    Returns:
+    img_range_intensity (unsigned 8-bit integer): numpy array containing the processed range and intensity channels
+
+    """
+
+    print("Visualize range image")
+
+    # extract lidar data and range image for the roof-mounted lidar
+    lidar = waymo_utils.get(frame.lasers, lidar_name)
+    range_image, camera_projection, range_image_pose = waymo_utils.parse_range_image_and_camera_projection(lidar)  # Parse the top laser range image and get the associated projection.
+
+    # extract the range [0] and the intensity [1] channel from the range image
+    range_channel = range_image[:, :, 0]
+    intensity_channel = range_image[:, :, 1]
+
+    # set values <0 to zero
+    range_channel[range_channel < 0] = 0
+    intensity_channel[intensity_channel < 0] = 0
     
-    # step 2 : extract the range and the intensity channel from the range image
+    # map the range channel onto an 8-bit scale and make sure that the full range of values is appropriately considered
+    range_channel = range_channel * 255 / (np.max(range_channel) - np.min(range_channel))
+    range_channel = range_channel.astype(np.uint8)
+
+    # map the intensity channel onto an 8-bit scale
+    # normalize with the difference between the 1- and 99-percentile to mitigate the influence of outliers
+    perc_1, perc_99 = np.percentile(intensity_channel, (1, 99))
+    intensity_channel = 255 * (intensity_channel - perc_1) / (perc_99 - perc_1)
+    intensity_channel = intensity_channel.astype(np.uint8)
     
-    # step 3 : set values <0 to zero
-    
-    # step 4 : map the range channel onto an 8-bit scale and make sure that the full range of values is appropriately considered
-    
-    # step 5 : map the intensity channel onto an 8-bit scale and normalize with the difference between the 1- and 99-percentile to mitigate the influence of outliers
-    
-    # step 6 : stack the range and intensity image vertically using np.vstack and convert the result to an unsigned 8-bit integer
-    
-    img_range_intensity = [] # remove after implementing all steps
-    #######
-    ####### ID_S1_EX1 END #######     
+    # stack the range and intensity image vertically using np.vstack and convert the result to an unsigned 8-bit integer
+    img_range_intensity = np.vstack((range_channel, intensity_channel)).astype(np.uint8)
     
     return img_range_intensity
 
