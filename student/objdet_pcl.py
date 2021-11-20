@@ -31,14 +31,16 @@ from tools.waymo_reader.simple_waymo_open_dataset_reader import dataset_pb2, lab
 import misc.objdet_tools as tools
 
 
+# callback next frame function
 def next_frame(visualizer):
     visualizer.close()
 
 
+# callback exit function
 def exit(visualizer):
     visualizer.destroy_window()
 
-# visualize lidar point-cloud
+
 def show_pcl(pcl):
     """
     Visualize LIDAR point-cloud
@@ -118,8 +120,10 @@ def show_range_image(frame, lidar_name):
 def bev_from_pcl(lidar_pcl, configs):
     """
     Create birds-eye view of lidar data.
+    1. Convert sensor coordinates to bev-map coordinates
     Ref http://ronny.rest/tutorials/module/pointclouds_01/point_cloud_birdseye/
-    (lidar_pcl is already in vehicle space!)
+    2. Compute intensity layer of the BEV map
+    3. Compute height layer of the BEV map
 
     Parameters:
     lidar_pcl (2D numpy array): lidar point cloud which is to be converted (point = [x y z r])
@@ -137,15 +141,19 @@ def bev_from_pcl(lidar_pcl, configs):
     lidar_pcl = lidar_pcl[mask]
     
     # shift level of ground plane to avoid flipping from 0 to 255 for neighboring pixels
-    lidar_pcl[:, 2] = lidar_pcl[:, 2] - configs.lim_z[0]  
+    lidar_pcl[:, 2] = lidar_pcl[:, 2] - configs.lim_z[0]
 
-    # convert sensor coordinates to bev-map coordinates (center is bottom-middle)
+    ##################
+    # Convert sensor coordinates to bev-map coordinates (center is bottom-middle)
+    ##################
+
     print("Convert sensor coordinates to bev-map coordinates")
 
     # compute bev-map discretization (resolution) by dividing x-range by the bev-image height (see configs)
     pcl_res = (configs.lim_x[1] - configs.lim_x[0]) / configs.bev_height
 
     # create a copy of the lidar pcl and transform all metrics x-coordinates into bev-image coordinates
+    # (lidar_pcl is already in vehicle space!)
     lidar_pcl_cpy = np.copy(lidar_pcl)
     lidar_pcl_cpy[:, 0] = np.int_(np.floor(lidar_pcl_cpy[:, 0] / pcl_res))
 
@@ -156,15 +164,11 @@ def bev_from_pcl(lidar_pcl, configs):
     # visualize point-cloud using the function show_pcl from a previous task
     show_pcl(lidar_pcl_cpy)
 
-    return
-
-    
+    ##################
     # Compute intensity layer of the BEV map
-    ####### ID_S2_EX2 START #######     
-    #######
-    print("student task ID_S2_EX2")
+    ##################
 
-    ## step 1 : create a numpy array filled with zeros which has the same dimensions as the BEV map
+    # create a numpy array filled with zeros which has the same dimensions as the BEV map
 
     # step 2 : re-arrange elements in lidar_pcl_cpy by sorting first by x, then y, then -z (use numpy.lexsort)
 
