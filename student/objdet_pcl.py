@@ -39,7 +39,7 @@ def exit(visualizer):
     visualizer.destroy_window()
 
 # visualize lidar point-cloud
-def show_pcl(pcl, cnt_frame):
+def show_pcl(pcl):
     """
     Visualize LIDAR point-cloud
 
