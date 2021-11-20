@@ -14,6 +14,7 @@
 import cv2
 import numpy as np
 import torch
+import open3d as o3d
 
 # add project directory to python path to enable relative imports
 import os
@@ -35,18 +36,26 @@ def show_pcl(pcl):
 
     print("Visualize lidar point-cloud")
 
-    # step 1 : initialize open3d with key callback and create window
+    # initialize open3d with key callback and create window
+    vis = o3d.visualization.VisualizerWithKeyCallback()
+    vis.create_window('LIDAR Point-Cloud')
     
-    # step 2 : create instance of open3d point-cloud class
+    # create instance of open3d point-cloud class
+    pcd = o3d.geometry.PointCloud()
 
-    # step 3 : set points in pcd instance by converting the point-cloud into 3d vectors (using open3d function Vector3dVector)
+    # set points in pcd instance by converting the point-cloud into 3d vectors (using open3d function Vector3dVector)
+    pcd.points = o3d.utility.Vector3dVector(pcl[:, :3])
 
-    # step 4 : for the first frame, add the pcd instance to visualization using add_geometry; for all other frames, use update_geometry instead
-    
-    # step 5 : visualize point cloud and keep window open until right-arrow is pressed (key-code 262)
+    # for the first frame, add the pcd instance to visualization using add_geometry;
+    # for all other frames, use update_geometry instead
+    vis.add_geometry(pcd)
 
-    #######
-    ####### ID_S1_EX2 END #######     
+    # visualize point cloud and keep window open until right-arrow is pressed (key-code 262)
+    vis.register_key_callback(262, vis.destroy_window())
+    vis.update_renderer()
+    vis.poll_events()
+    vis.run()
+
        
 
 # visualize range image
@@ -79,6 +88,7 @@ def bev_from_pcl(lidar_pcl, configs):
     """
     Create birds-eye view of lidar data.
     Ref http://ronny.rest/tutorials/module/pointclouds_01/point_cloud_birdseye/
+    (lidar_pcl is already in vehicle space!)
 
     Parameters:
     lidar_pcl (2D numpy array): lidar point cloud which is to be converted (point = [x y z r])
@@ -101,18 +111,21 @@ def bev_from_pcl(lidar_pcl, configs):
     # convert sensor coordinates to bev-map coordinates (center is bottom-middle)
     print("Convert sensor coordinates to bev-map coordinates")
 
-    ## step 1 :  compute bev-map discretization by dividing x-range by the bev-image height (see configs)
-    lidar_pcl[:, 0] /= configs.bev_height
+    # compute bev-map discretization (resolution) by dividing x-range by the bev-image height (see configs)
+    pcl_res = (configs.lim_x[1] - configs.lim_x[0]) / configs.bev_height
 
-    ## step 2 : create a copy of the lidar pcl and transform all metrix x-coordinates into bev-image coordinates
-    bev_pcl = lidar_pcl.copy()
-    bev_pcl[:, 1] = - lidar_pcl[:, 0] / configs.bev_height + configs.bev_height
+    # create a copy of the lidar pcl and transform all metrics x-coordinates into bev-image coordinates
+    lidar_pcl_cpy = np.copy(lidar_pcl)
+    lidar_pcl_cpy[:, 0] = np.int_(np.floor(lidar_pcl_cpy[:, 0] / pcl_res))
 
-    # step 3 : perform the same operation as in step 2 for the y-coordinates but make sure that no negative bev-coordinates occur
-    bev_pcl[:, 0] = - lidar_pcl[:, 1] / configs.bev_width + configs.bev_width / 2
+    # perform the same operation as in step 2 for the y-coordinates but make sure that no negative bev-coordinates occur
+    pcl_res = (configs.lim_y[1] - configs.lim_y[0]) / configs.bev_width
+    lidar_pcl_cpy[:, 1] = np.int_(np.floor(lidar_pcl_cpy[:, 1] / pcl_res + (configs.bev_width + 1) / 2))
 
-    # step 4 : visualize point-cloud using the function show_pcl from a previous task
-    show_pcl(bev_pcl)
+    # visualize point-cloud using the function show_pcl from a previous task
+    show_pcl(lidar_pcl_cpy)
+
+    return
 
     
     # Compute intensity layer of the BEV map
@@ -154,7 +167,6 @@ def bev_from_pcl(lidar_pcl, configs):
     ####### ID_S2_EX3 END #######       
 
     # TODO remove after implementing all of the above steps
-    lidar_pcl_cpy = []
     lidar_pcl_top = []
     height_map = []
     intensity_map = []
