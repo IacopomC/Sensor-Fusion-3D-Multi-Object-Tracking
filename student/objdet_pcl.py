@@ -31,8 +31,23 @@ from tools.waymo_reader.simple_waymo_open_dataset_reader import dataset_pb2, lab
 import misc.objdet_tools as tools
 
 
+def next_frame(visualizer):
+    visualizer.close()
+
+
+def exit(visualizer):
+    visualizer.destroy_window()
+
 # visualize lidar point-cloud
-def show_pcl(pcl):
+def show_pcl(pcl, cnt_frame):
+    """
+    Visualize LIDAR point-cloud
+
+    Parameters:
+    pcl (2D numpy array): lidar point cloud to visualize
+    cnt_frame (int): index current frame corresponding to pcl
+
+    """
 
     print("Visualize lidar point-cloud")
 
@@ -44,16 +59,15 @@ def show_pcl(pcl):
     pcd = o3d.geometry.PointCloud()
 
     # set points in pcd instance by converting the point-cloud into 3d vectors (using open3d function Vector3dVector)
-    pcd.points = o3d.utility.Vector3dVector(pcl[:, :3])
+    pcd.points = o3d.utility.Vector3dVector(pcl[:, :3]) # [x,y,z,r] we don't need r. pcl[:, :3]
 
-    # for the first frame, add the pcd instance to visualization using add_geometry;
-    # for all other frames, use update_geometry instead
+    # add the pcd instance to visualization using add_geometry
     vis.add_geometry(pcd)
 
-    # visualize point cloud and keep window open until right-arrow is pressed (key-code 262)
-    vis.register_key_callback(262, vis.destroy_window())
-    vis.update_renderer()
-    vis.poll_events()
+    # visualize point cloud and keep window open until right-arrow or space-bar are pressed
+    # right-arrow (key-code 262) move to next frame while space-bar (key-code 262) exits the process
+    vis.register_key_callback(262, next_frame)
+    vis.register_key_callback(32, exit)
     vis.run()
 
 
