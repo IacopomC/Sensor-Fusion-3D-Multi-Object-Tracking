@@ -118,6 +118,7 @@ def bev_from_pcl(lidar_pcl, configs):
     Ref http://ronny.rest/tutorials/module/pointclouds_01/point_cloud_birdseye/
     2. Compute intensity layer of the BEV map
     3. Compute height layer of the BEV map
+    4. Compute density layer of the BEV map
 
     Parameters:
     lidar_pcl (2D numpy array): lidar point cloud which is to be converted (point = [x y z r])
@@ -206,7 +207,10 @@ def bev_from_pcl(lidar_pcl, configs):
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
 
+    ##################
     # Compute density layer of the BEV map
+    ##################
+
     density_map = np.zeros((configs.bev_height + 1, configs.bev_width + 1))
     _, _, counts = np.unique(lidar_pcl_cpy[:, 0:2], axis=0, return_index=True, return_counts=True)
     normalizedCounts = np.minimum(1.0, np.log(counts + 1) / np.log(64)) 
