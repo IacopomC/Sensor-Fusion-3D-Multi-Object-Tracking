@@ -36,11 +36,6 @@ def next_frame(visualizer):
     visualizer.close()
 
 
-# callback exit function
-def exit(visualizer):
-    visualizer.destroy_window()
-
-
 def show_pcl(pcl):
     """
     Visualize LIDAR point-cloud
@@ -69,7 +64,6 @@ def show_pcl(pcl):
     # visualize point cloud and keep window open until right-arrow or space-bar are pressed
     # right-arrow (key-code 262) move to next frame while space-bar (key-code 262) exits the process
     vis.register_key_callback(262, next_frame)
-    vis.register_key_callback(32, exit)
     vis.run()
 
 
