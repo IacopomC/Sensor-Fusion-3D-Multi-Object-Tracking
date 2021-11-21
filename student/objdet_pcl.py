@@ -171,8 +171,8 @@ def bev_from_pcl(lidar_pcl, configs):
     lidar_pcl_top = lidar_pcl_cpy[idx]
 
     # extract all points with identical x and y such that only the top-most z-coordinate is kept (use numpy.unique)
-    # also, store the number of points per x,y-cell in a variable named "counts" for use in the next task
-    lidar_pcl_top, indices, counts = np.unique(lidar_pcl_top, axis=0, return_index=True, return_counts=True)
+    _, indices = np.unique(lidar_pcl_top[:, 0:2], axis=0, return_index=True)
+    lidar_pcl_top = lidar_pcl_top[indices]
 
     # assign the intensity value of each unique entry in lidar_top_pcl to the intensity map
     # normalize intensity with the difference between the 1- and 99-percentile to mitigate the influence of outliers
