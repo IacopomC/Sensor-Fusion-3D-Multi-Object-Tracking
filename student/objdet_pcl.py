@@ -164,7 +164,7 @@ def bev_from_pcl(lidar_pcl, configs):
     ##################
 
     # create a numpy array filled with zeros which has the same dimensions as the BEV map
-    intensity_map = np.zeros((configs.bev_height, configs.bev_width))
+    intensity_map = np.zeros((configs.bev_height + 1, configs.bev_width + 1))
 
     # re-arrange elements in lidar_pcl_cpy by sorting first by x, then y, then -z (use numpy.lexsort)
     idx = np.lexsort((-lidar_pcl_cpy[:, 2], lidar_pcl_cpy[:, 1], lidar_pcl_cpy[:, 0]))
@@ -200,14 +200,11 @@ def bev_from_pcl(lidar_pcl, configs):
         (lidar_pcl_top[:, 2] - configs.lim_z[0]) / (configs.lim_z[1] - configs.lim_z[0])
 
     # Visualize the height map
-    height_img = height_map * 255
-    height_img = height_img.astype(np.uint8)
-    cv2.imshow('Height Map', height_img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    return
-
+    # height_img = height_map * 255
+    # height_img = height_img.astype(np.uint8)
+    # cv2.imshow('Height Map', height_img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     # Compute density layer of the BEV map
     density_map = np.zeros((configs.bev_height + 1, configs.bev_width + 1))
