@@ -89,10 +89,6 @@ The object detection methods used in this project use pre-trained models which h
 
 In the main file `loop_over_dataset.py`, you can choose which steps of the algorithm should be executed. If you want to call a specific function, you simply need to add the corresponding string literal to one of the following lists:
 
-- `exec_data` : controls the execution of steps related to sensor data.
-  - `pcl_from_rangeimage` transforms the Waymo Open Data range image into a 3D point-cloud
-  - `load_image` returns the image of the front camera
-
 - `exec_detection` : controls which steps of model-based 3D object detection are performed
   - `bev_from_pcl` transforms the point-cloud into a fixed-size birds-eye view perspective
   - `detect_objects` executes the actual detection and returns a set of objects (only vehicles)
