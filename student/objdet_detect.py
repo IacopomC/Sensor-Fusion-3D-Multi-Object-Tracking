@@ -191,6 +191,8 @@ def create_model(configs):
 def detect_objects(input_bev_maps, model, configs):
     """"
     Detect trained objects in birds-eye view
+    1. Decode model output and perform post-processing
+    2. Convert BEV coordinates into pixel coordinates
 
     Parameters:
     input_bev_maps (tensor): bird eye view map of point cloud to feed to the model
@@ -201,6 +203,11 @@ def detect_objects(input_bev_maps, model, configs):
     objects ():
 
     """
+
+
+    ##################
+    # Decode model output and perform post-processing
+    ##################
 
     # deactivate autograd engine during test to reduce memory usage and speed up computations
     with torch.no_grad():  
@@ -230,24 +237,31 @@ def detect_objects(input_bev_maps, model, configs):
             detections = detections.cpu().numpy().astype(np.float32)
             detections = post_processing(detections, configs)
             detections = detections[0][1]
-            
 
-    ####### ID_S3_EX2 START #######     
-    #######
+    ##################
+    # Convert BEV coordinates into pixel coordinates
+    ##################
+
     # Extract 3d bounding boxes from model response
-    print("student task ID_S3_EX2")
-    objects = [] 
+    objects = []
 
-    ## step 1 : check whether there are any detections
+    # check whether there are any detections
+    if len(detections):
+        # loop over all detections
+        for obj in detections:
+            # perform the conversion using the limits for x, y and z set in the configs structure
+            _, bev_x, bev_y, z, bbox_bev_height, bbox_bev_width, bbox_bev_length, yaw = obj
 
-        ## step 2 : loop over all detections
-        
-            ## step 3 : perform the conversion using the limits for x, y and z set in the configs structure
-        
-            ## step 4 : append the current object to the 'objects' array
-        
-    #######
-    ####### ID_S3_EX2 START #######   
-    
+            img_x = bev_y / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
+            img_y = bev_x / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0]) - (
+                        configs.lim_y[1] - configs.lim_y[0]) / 2.0
+            bbox_img_width = bbox_bev_width / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0])
+            bbox_img_length = bbox_bev_length / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
+            if ((x >= configs.lim_x[0]) and (x <= configs.lim_x[1])
+                    and (y >= configs.lim_y[0]) and (y <= configs.lim_y[1])
+                    and (z >= configs.lim_z[0]) and (z <= configs.lim_z[1])):
+                # append the current object to the 'objects' array
+                objects.append([1, img_x, img_y, z, bbox_bev_height, bbox_img_width, bbox_img_length, yaw])
+
     return objects    
 
