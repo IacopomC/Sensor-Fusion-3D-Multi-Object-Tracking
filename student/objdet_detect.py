@@ -234,19 +234,15 @@ def detect_objects(input_bev_maps, model, configs):
                                 outputs['direction'], outputs['z_coor'], outputs['dim'], K=configs.k)
             detections = detections.cpu().numpy().astype(np.float32)
             detections = post_processing(detections, configs)
-            print('detections ', detections)
             detections = detections[0][1]
 
     # Extract 3d bounding boxes from model response
     objects = []
 
-    print('detection array ', detections)
-
     # check whether there are any detections
     if len(detections) > 0:
         # loop over all detections
         for obj in detections:
-            print('detection ', detection)
             # perform the conversion using the limits for x, y and z set in the configs structure
             _, bev_x, bev_y, _z, bbox_bev_height, bbox_bev_width, bbox_bev_length, yaw = obj
 
