@@ -33,6 +33,7 @@ from tools.objdet_models.darknet.utils.evaluation_utils import post_processing_v
 def load_configs_model(model_name='darknet', configs=None):
     """"
     Load model-related parameters into an edict
+    Ref https://github.com/maudzung/SFA3D/blob/master/sfa/test.py
 
     Parameters:
     model_name (string):
