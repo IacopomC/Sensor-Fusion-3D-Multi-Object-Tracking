@@ -225,14 +225,11 @@ def detect_objects(input_bev_maps, model, configs):
 
         elif 'fpn_resnet' in configs.arch:
             # decode output and perform post-processing
-            
-            ####### ID_S3_EX1-5 START #######     
-            #######
-            print("student task ID_S3_EX1-5")
-
-            #######
-            ####### ID_S3_EX1-5 END #######     
-
+            detections = decode(outputs['hm_cen'], outputs['cen_offset'],
+                                outputs['direction'], outputs['z_coor'], outputs['dim'], K=configs.k)
+            detections = detections.cpu().numpy().astype(np.float32)
+            detections = post_processing(detections, configs)
+            detections = detections[0][1]
             
 
     ####### ID_S3_EX2 START #######     
