@@ -404,7 +404,8 @@ def show_objects_in_bev_labels_in_camera(detections, bev_maps, image, object_lab
     out_img[output_rgb_h:, ...] = ret_img_bev
 
     # show combined view
-    cv2.imshow('labels vs. detected objects', out_img)
+    out_img_resized = cv2.resize(out_img, (0, 0), fx=0.7, fy=0.7)
+    cv2.imshow('labels vs. detected objects', out_img_resized)
 
 
 # visualize object labels in camera image
