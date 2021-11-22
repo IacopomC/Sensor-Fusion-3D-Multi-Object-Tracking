@@ -24,7 +24,7 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 # model-related
 from tools.objdet_models.resnet.models import fpn_resnet
-from tools.objdet_models.resnet.utils.evaluation_utils import decode, post_processing 
+from tools.objdet_models.resnet.utils.evaluation_utils import decode, post_processing
 
 from tools.objdet_models.darknet.models.darknet2pytorch import Darknet as darknet
 from tools.objdet_models.darknet.utils.evaluation_utils import post_processing_v2
@@ -45,12 +45,12 @@ def load_configs_model(model_name='darknet', configs=None):
 
     # init config file, if none has been passed
     if configs==None:
-        configs = edict()  
+        configs = edict()
 
     # get parent directory of this file to enable relative paths
     curr_path = os.path.dirname(os.path.realpath(__file__))
-    parent_path = configs.model_path = os.path.abspath(os.path.join(curr_path, os.pardir))    
-    
+    parent_path = configs.model_path = os.path.abspath(os.path.join(curr_path, os.pardir))
+
     # set parameters according to model type
     if model_name == "darknet":
         configs.model_path = os.path.join(parent_path, 'tools', 'objdet_models', 'darknet')
@@ -72,7 +72,7 @@ def load_configs_model(model_name='darknet', configs=None):
         configs.pretrained_filename = configs.pretrained_path \
             = os.path.join(configs.model_path, 'pretrained', 'fpn_resnet_18_epoch_300.pth')
         configs.arch = 'fpn_resnet'
-        configs.batch_size = 1
+        configs.batch_size = 4
         configs.conf_thresh = 0.5
         configs.distributed = False
         configs.num_samples = None
@@ -129,7 +129,7 @@ def load_configs(model_name='fpn_resnet', configs=None):
 
     # init config file, if none has been passed
     if configs==None:
-        configs = edict()    
+        configs = edict()
 
     # birds-eye view (bev) parameters
     configs.lim_x = [0, 50] # detection range in m
@@ -137,7 +137,7 @@ def load_configs(model_name='fpn_resnet', configs=None):
     configs.lim_z = [-1, 3]
     configs.lim_r = [0, 1.0] # reflected lidar intensity
     configs.bev_width = 608  # pixel resolution of bev image
-    configs.bev_height = 608 
+    configs.bev_height = 608
 
     # add model-dependent parameters
     configs = load_configs_model(model_name, configs)
@@ -166,13 +166,13 @@ def create_model(configs):
     # create model depending on architecture name
     if (configs.arch == 'darknet') and (configs.cfgfile is not None):
         print('using darknet')
-        model = darknet(cfgfile=configs.cfgfile, use_giou_loss=configs.use_giou_loss)    
-    
+        model = darknet(cfgfile=configs.cfgfile, use_giou_loss=configs.use_giou_loss)
+
     elif 'fpn_resnet' in configs.arch:
         print('using ResNet architecture with feature pyramid')
         model = fpn_resnet.get_pose_net(num_layers=configs.num_layers, heads=configs.heads,
                                         head_conv=configs.head_conv, imagenet_pretrained=configs.imagenet_pretrained)
-    
+
     else:
         assert False, 'Undefined model backbone'
 
@@ -183,7 +183,7 @@ def create_model(configs):
     # set model to evaluation state
     configs.device = torch.device('cpu' if configs.no_cuda else 'cuda:{}'.format(configs.gpu_idx))
     model = model.to(device=configs.device)  # load model to either cpu or gpu
-    model.eval()          
+    model.eval()
 
     return model
 
@@ -191,8 +191,6 @@ def create_model(configs):
 def detect_objects(input_bev_maps, model, configs):
     """"
     Detect trained objects in birds-eye view
-    1. Decode model output and perform post-processing
-    2. Convert BEV coordinates into pixel coordinates
 
     Parameters:
     input_bev_maps (tensor): bird eye view map of point cloud to feed to the model
@@ -210,7 +208,7 @@ def detect_objects(input_bev_maps, model, configs):
     ##################
 
     # deactivate autograd engine during test to reduce memory usage and speed up computations
-    with torch.no_grad():  
+    with torch.no_grad():
 
         # perform inference
         outputs = model(input_bev_maps)
@@ -219,7 +217,7 @@ def detect_objects(input_bev_maps, model, configs):
         if 'darknet' in configs.arch:
 
             # perform post-processing
-            output_post = post_processing_v2(outputs, conf_thresh=configs.conf_thresh, nms_thresh=configs.nms_thresh) 
+            output_post = post_processing_v2(outputs, conf_thresh=configs.conf_thresh, nms_thresh=configs.nms_thresh)
             detections = []
             for sample_i in range(len(output_post)):
                 if output_post[sample_i] is None:
@@ -228,7 +226,7 @@ def detect_objects(input_bev_maps, model, configs):
                 for obj in detection:
                     x, y, w, l, im, re, _, _, _ = obj
                     yaw = np.arctan2(im, re)
-                    detections.append([1, x, y, 0.0, 1.50, w, l, yaw])    
+                    detections.append([1, x, y, 0.0, 1.50, w, l, yaw])
 
         elif 'fpn_resnet' in configs.arch:
             # decode output and perform post-processing
@@ -236,25 +234,26 @@ def detect_objects(input_bev_maps, model, configs):
                                 outputs['direction'], outputs['z_coor'], outputs['dim'], K=configs.k)
             detections = detections.cpu().numpy().astype(np.float32)
             detections = post_processing(detections, configs)
+            print('detections ', detections)
             detections = detections[0][1]
-
-    ##################
-    # Convert BEV coordinates into pixel coordinates
-    ##################
 
     # Extract 3d bounding boxes from model response
     objects = []
 
+    print('detection array ', detections)
+
     # check whether there are any detections
-    if len(detections):
+    if len(detections) > 0:
         # loop over all detections
         for obj in detections:
+            print('detection ', detection)
             # perform the conversion using the limits for x, y and z set in the configs structure
-            _, bev_x, bev_y, z, bbox_bev_height, bbox_bev_width, bbox_bev_length, yaw = obj
+            _, bev_x, bev_y, _z, bbox_bev_height, bbox_bev_width, bbox_bev_length, yaw = obj
 
             img_x = bev_y / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
             img_y = bev_x / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0]) - (
                         configs.lim_y[1] - configs.lim_y[0]) / 2.0
+            z = _z - configs.lim_z[0]
             bbox_img_width = bbox_bev_width / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0])
             bbox_img_length = bbox_bev_length / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
             if ((x >= configs.lim_x[0]) and (x <= configs.lim_x[1])
@@ -263,5 +262,5 @@ def detect_objects(input_bev_maps, model, configs):
                 # append the current object to the 'objects' array
                 objects.append([1, img_x, img_y, z, bbox_bev_height, bbox_img_width, bbox_img_length, yaw])
 
-    return objects    
+    return objects
 
