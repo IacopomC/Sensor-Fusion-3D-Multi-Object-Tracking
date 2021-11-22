@@ -193,7 +193,7 @@ def detect_objects(input_bev_maps, model, configs):
     Detect trained objects in birds-eye view
 
     Parameters:
-    input_bev_maps (tensor): bird eye view map of point cloud composed of density, intensity and height layers
+    input_bev_maps (tensor): bird eye view map of point cloud to feed to the model
     model (): pytorch version of darknet or resnet
     configs (edict): dictionary containing object and model-related parameters
 
