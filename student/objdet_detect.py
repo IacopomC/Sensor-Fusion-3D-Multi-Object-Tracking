@@ -113,8 +113,17 @@ def load_configs_model(model_name='darknet', configs=None):
     return configs
 
 
-# load all object-detection parameters into an edict
 def load_configs(model_name='fpn_resnet', configs=None):
+    """"
+    Load all object-detection parameters into an edict
+
+    Parameters:
+    model_name (string): name of the model to load
+    configs (): edict containing object and model-related parameters
+
+    Returns:
+    configs (): edict with updated parameters configured
+    """
 
     # init config file, if none has been passed
     if configs==None:
