@@ -37,10 +37,10 @@ def load_configs_model(model_name='darknet', configs=None):
 
     Parameters:
     model_name (string): name of the model to load
-    configs (): edict containing model-related parameters
+    configs (edict): dictionary containing model-related parameters
 
     Returns:
-    configs (): edict with updated parameters configured
+    configs (edict): dictionary with updated parameters configured
     """
 
     # init config file, if none has been passed
@@ -121,10 +121,10 @@ def load_configs(model_name='fpn_resnet', configs=None):
 
     Parameters:
     model_name (string): name of the model to load
-    configs (): edict containing object and model-related parameters
+    configs (edict): dictionary containing object and model-related parameters
 
     Returns:
-    configs (): edict with updated parameters configured
+    configs (edict): dictionary with updated parameters configured
     """
 
     # init config file, if none has been passed
@@ -149,8 +149,16 @@ def load_configs(model_name='fpn_resnet', configs=None):
     return configs
 
 
-# create model according to selected model type
 def create_model(configs):
+    """"
+    Create model according to selected model type
+
+    Parameters:
+    configs (edict): dictionary containing object and model-related parameters
+
+    Returns:
+    model (): pytorch version of darknet or resnet
+    """
 
     # check for availability of model file
     assert os.path.isfile(configs.pretrained_filename), "No file at {}".format(configs.pretrained_filename)
