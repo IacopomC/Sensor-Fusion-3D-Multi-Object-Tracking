@@ -30,8 +30,17 @@ from tools.objdet_models.darknet.models.darknet2pytorch import Darknet as darkne
 from tools.objdet_models.darknet.utils.evaluation_utils import post_processing_v2
 
 
-# load model-related parameters into an edict
 def load_configs_model(model_name='darknet', configs=None):
+    """"
+    Load model-related parameters into an edict
+
+    Parameters:
+    model_name (string):
+    configs ():
+
+    Returns:
+    configs ():
+    """
 
     # init config file, if none has been passed
     if configs==None:
