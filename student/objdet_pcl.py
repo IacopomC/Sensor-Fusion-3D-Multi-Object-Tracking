@@ -178,6 +178,8 @@ def bev_from_pcl(lidar_pcl, configs):
     # assign the intensity value of each unique entry in lidar_top_pcl to the intensity map
     # normalize intensity with the difference between the 1- and 99-percentile to mitigate the influence of outliers
     perc_1, perc_99 = np.percentile(lidar_pcl_top[:, 3], (1, 99))
+    lidar_pcl_top[:, 3][lidar_pcl_top[:, 3] < perc_1] = perc_1
+    lidar_pcl_top[:, 3][lidar_pcl_top[:, 3] > perc_99] = perc_99
     intensity_map[np.int_(lidar_pcl_top[:, 0]), np.int_(lidar_pcl_top[:, 1])] = \
         (lidar_pcl_top[:, 3] - perc_1) / (perc_99 - perc_1)
 
