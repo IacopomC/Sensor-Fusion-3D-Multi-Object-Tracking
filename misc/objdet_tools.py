@@ -198,7 +198,6 @@ def pcl_from_range_image(frame, lidar_name):
 
 # project detected bounding boxes into birds-eye view
 def project_detections_into_bev(bev_map, detections, configs, color=[]):
-    print('detections ', detections)
     for row in detections:
         # extract detection
         _id, _x, _y, _z, _h, _w, _l, _yaw = row
