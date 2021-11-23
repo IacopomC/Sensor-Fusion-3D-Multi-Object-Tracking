@@ -35,20 +35,21 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     """
     Compute various performance measures to assess object detection
     1. Compute Intersection Over Union (iou) and distance between centers to find best match between detection and label
+    2. Compute number of positive detections, true positives, false negatives, false positives
 
     Parameters:
     detections (list): detected bounding boxes in image coordinates [id, x, y, z, height, width, length, yaw]
     labels (RepeatedCompositeContainer): set of information for each object
                                          [box {x, y, z, w, l, h, y}, metadata {speed, acceleration}, type, id]
-    labels_valid (numpy array): set of flags determining which label is valid
+    labels_valid (numpy array): set of flags determining which label is valid [False, True, False,...]
     min_iou (float): Intersection Over Union threshold
 
     Returns:
-    det_performance ():
+    det_performance (list): set of parameters to evaluate detection
+                            [ious, center_devs, [all_positives, true_positives, false_negatives, false_positives]]
     """
 
     # find best detection for each valid label
-    true_positives = 0  # no. of correctly detected objects
     center_devs = []
     ious = []
     for label, valid in zip(labels, labels_valid):
@@ -81,10 +82,9 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
 
                 iou = label_pol.intersection(det_pol).area / label_pol.union(det_pol).area
                 
-                # if IOU > min_iou, store [iou,dist_x, dist_y, dist_z] in matches_lab_det and increase the TP count
+                # if IOU > min_iou, store [iou,dist_x, dist_y, dist_z] in matches_lab_det
                 if iou >= min_iou:
                     matches_lab_det.append([iou, dist_x, dist_y, dist_z])
-                    true_positives +=1
             
         # find best match and compute metrics
         if matches_lab_det:
@@ -93,25 +93,22 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
             ious.append(best_match[0])
             center_devs.append(best_match[1:])
 
+    ##################
+    # Compute positives and negatives for precision/recall
+    ##################
 
-    ####### ID_S4_EX2 START #######     
-    #######
-    print("student task ID_S4_EX2")
-    
-    # compute positives and negatives for precision/recall
-    
-    ## step 1 : compute the total number of positives present in the scene
-    all_positives = 0
+    # compute the total number of detections really present in the scene
+    all_positives = labels_valid.sum()
 
-    ## step 2 : compute the number of false negatives
-    false_negatives = 0
+    # computer the number of true positives (correctly detected objects)
+    true_positives = len(ious)
 
-    ## step 3 : compute the number of false positives
-    false_positives = 0
-    
-    #######
-    ####### ID_S4_EX2 END #######     
-    
+    # compute the number of false negatives (missed objects)
+    false_negatives = all_positives - true_positives
+
+    # compute the number of false positives (misclassified objects)
+    false_positives = len(detections) - true_positives
+
     pos_negs = [all_positives, true_positives, false_negatives, false_positives]
     det_performance = [ious, center_devs, pos_negs]
     
