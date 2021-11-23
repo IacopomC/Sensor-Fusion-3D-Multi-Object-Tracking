@@ -31,16 +31,31 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import misc.objdet_tools as tools
 
 
-# compute various performance measures to assess object detection
 def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5):
-    
-     # find best detection for each valid label 
-    true_positives = 0 # no. of correctly detected objects
+    """
+    Compute various performance measures to assess object detection
+
+    Parameters:
+    detections (list): detected bounding boxes in image coordinates [id, x, y, z, height, width, length, yaw]
+    labels (RepeatedCompositeContainer): set of information for each object
+                                         [box {x, y, z, w, l, h, y}, metadata {speed, acceleration}, type, id]
+    labels_valid (numpy array): set of flags determining which label is valid
+    min_iou (float): Intersection Over Union threshold
+
+    Returns:
+    det_performance ():
+    """
+
+    ##################
+    # Find best detection for each valid label
+    ##################
+
+    true_positives = 0  # no. of correctly detected objects
     center_devs = []
     ious = []
     for label, valid in zip(labels, labels_valid):
         matches_lab_det = []
-        if valid: # exclude all labels from statistics which are not considered valid
+        if valid:  # exclude all labels from statistics which are not considered valid
             
             # compute intersection over union (iou) and distance between centers
 
