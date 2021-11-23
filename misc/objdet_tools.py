@@ -198,6 +198,7 @@ def pcl_from_range_image(frame, lidar_name):
 
 # project detected bounding boxes into birds-eye view
 def project_detections_into_bev(bev_map, detections, configs, color=[]):
+    print('detections ', detections)
     for row in detections:
         # extract detection
         _id, _x, _y, _z, _h, _w, _l, _yaw = row
@@ -232,7 +233,7 @@ def project_detections_into_bev(bev_map, detections, configs, color=[]):
         cv2.polylines(bev_map, [corners_int], True, color, 2)
 
         # draw colored line to identify object front
-        corners_int = bev_corners.reshape(-1, 2)
+        corners_int = bev_corners.reshape(-1, 2).astype(int)
         cv2.line(bev_map, (corners_int[0, 0], corners_int[0, 1]), (corners_int[3, 0], corners_int[3, 1]), (255, 255, 0), 2)
 
 
