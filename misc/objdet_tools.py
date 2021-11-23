@@ -293,8 +293,20 @@ def convert_labels_into_objects(object_labels, configs):
     return detections
 
 
-# compute location of each corner of a box and returns [front_left, rear_left, rear_right, front_right]
-def compute_box_corners(x,y,w,l,yaw):
+def compute_box_corners(x, y, w, l, yaw):
+    """"
+    Extract location of each corner from bounding box parameters
+
+    Parameters:
+    x (float): x coordinate center bounding box
+    y (float): y coordinate center bounding box
+    w (float): width bounding box
+    l (float): length bounding box
+    yaw (float): orientation bounding box
+
+    Returns:
+    [front_left, rear_left, rear_right, front_right] : list of four corners of bounding box
+    """
     cos_yaw = np.cos(yaw)
     sin_yaw = np.sin(yaw)
     
@@ -310,7 +322,7 @@ def compute_box_corners(x,y,w,l,yaw):
     fr = (x + w / 2 * cos_yaw - l / 2 * sin_yaw,  # front right
           y + w / 2 * sin_yaw + l / 2 * cos_yaw)
 
-    return [fl,rl,rr,fr]
+    return [fl, rl, rr, fr]
 
 
 # checks whether label is inside detection area
