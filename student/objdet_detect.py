@@ -253,9 +253,9 @@ def detect_objects(input_bev_maps, model, configs):
                         configs.lim_y[1] - configs.lim_y[0]) / 2.0
             bbox_img_width = bbox_bev_width / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0])
             bbox_img_length = bbox_bev_length / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
-            if ((img_x >= configs.lim_x[0]) and (img_x <= configs.lim_x[1])
-                    and (img_y >= configs.lim_y[0]) and (img_y <= configs.lim_y[1])
-                    and (z >= configs.lim_z[0]) and (z <= configs.lim_z[1])):
+            if (configs.lim_x[0] <= img_x <= configs.lim_x[1]
+                    and configs.lim_y[0] <= img_y <= configs.lim_y[1]
+                    and configs.lim_z[0] <= z <= configs.lim_z[1]):
                 # append the current object to the 'objects' array
                 objects.append([1, img_x, img_y, z, bbox_bev_height, bbox_img_width, bbox_img_length, yaw])
 
