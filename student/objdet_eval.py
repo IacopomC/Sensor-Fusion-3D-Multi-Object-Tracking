@@ -115,8 +115,18 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     return det_performance
 
 
-# evaluate object detection performance based on all frames
 def compute_performance_stats(det_performance_all):
+    """
+    Evaluate object detection performance based on all frames
+
+    Parameters:
+    det_performance_all (list): set of detection performance parameters for every frame
+                                [[ious, center_devs, [all_positives, true_positives, false_negatives, false_positives]],...]
+
+    Returns:
+    None
+
+    """
 
     # extract elements
     ious = []
@@ -126,21 +136,16 @@ def compute_performance_stats(det_performance_all):
         ious.append(item[0])
         center_devs.append(item[1])
         pos_negs.append(item[2])
-    
-    ####### ID_S4_EX3 START #######     
-    #######    
-    print('student task ID_S4_EX3')
 
-    ## step 1 : extract the total number of positives, true positives, false negatives and false positives
-    
-    ## step 2 : compute precision
-    precision = 0.0
+    # extract the total number of positives, true positives, false negatives and false positives
+    _, true_positives, false_negatives, false_positives = np.sum(pos_negs, axis=0)
 
-    ## step 3 : compute recall 
-    recall = 0.0
+    # compute precision
+    precision = true_positives / (true_positives + false_positives)
 
-    #######    
-    ####### ID_S4_EX3 END #######     
+    # compute recall
+    recall = true_positives / (true_positives + false_negatives)
+
     print('precision = ' + str(precision) + ", recall = " + str(recall))   
 
     # serialize intersection-over-union and deviations in x,y,z
