@@ -256,5 +256,6 @@ def detect_objects(input_bev_maps, model, configs):
                     and (z >= configs.lim_z[0]) and (z <= configs.lim_z[1])):
                 # append the current object to the 'objects' array
                 objects.append([1, img_x, img_y, z, bbox_bev_height, bbox_img_width, bbox_img_length, yaw])
+
     return objects
 
