@@ -13,7 +13,7 @@
 # general package imports
 import numpy as np
 import matplotlib
-matplotlib.use('wxagg') # change backend so that figure maximizing works on Mac as well     
+matplotlib.use('wxagg')  # change backend so that figure maximizing works on Mac as well
 import matplotlib.pyplot as plt
 
 import torch
@@ -34,6 +34,7 @@ import misc.objdet_tools as tools
 def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5):
     """
     Compute various performance measures to assess object detection
+    1. Compute Intersection Over Union (iou) and distance between centers to find best match between detection and label
 
     Parameters:
     detections (list): detected bounding boxes in image coordinates [id, x, y, z, height, width, length, yaw]
@@ -46,41 +47,49 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     det_performance ():
     """
 
-    ##################
-    # Find best detection for each valid label
-    ##################
-
+    # find best detection for each valid label
     true_positives = 0  # no. of correctly detected objects
     center_devs = []
     ious = []
     for label, valid in zip(labels, labels_valid):
         matches_lab_det = []
         if valid:  # exclude all labels from statistics which are not considered valid
+
+            ##################
+            # Compute intersection over union (iou) and distance between centers
+            ##################
+
+            # extract the four corners of the current label bounding-box
+            box = label.box
+            label_bbox = tools.compute_box_corners(box.center_x, box.center_y, box.width, box.length, box.heading)
             
-            # compute intersection over union (iou) and distance between centers
+            # loop over all detected objects
+            for det in detections:
 
-            ####### ID_S4_EX1 START #######     
-            #######
-            print("student task ID_S4_EX1 ")
+                # extract the four corners of the current detection
+                det_bbox = tools.compute_box_corners(det[1], det[2], det[5], det[6], det[7])  # x, y, w, l, y
 
-            ## step 1 : extract the four corners of the current label bounding-box
-            
-            ## step 2 : loop over all detected objects
+                # computer the center distance between label and detection bounding-box in x, y, and z
+                dist_x = box.center_x - det[1]
+                dist_y = box.center_y - det[2]
+                dist_z = box.center_z - det[3]
+                
+                # compute the intersection over union (IOU) between label and detection bounding-box
+                # https://codereview.stackexchange.com/questions/204017/intersection-over-union-for-rotated-rectangles
+                label_pol = Polygon(label_bbox)
+                det_pol = Polygon(det_bbox)
 
-                ## step 3 : extract the four corners of the current detection
+                iou = label_pol.intersection(det_pol).area / label_pol.union(det_pol).area
                 
-                ## step 4 : computer the center distance between label and detection bounding-box in x, y, and z
-                
-                ## step 5 : compute the intersection over union (IOU) between label and detection bounding-box
-                
-                ## step 6 : if IOU exceeds min_iou threshold, store [iou,dist_x, dist_y, dist_z] in matches_lab_det and increase the TP count
-                
-            #######
-            ####### ID_S4_EX1 END #######     
+                # if IOU > min_iou, store [iou,dist_x, dist_y, dist_z] in matches_lab_det and increase the TP count
+                if iou >= min_iou:
+                    matches_lab_det.append([iou, dist_x, dist_y, dist_z])
+                    true_positives +=1
             
         # find best match and compute metrics
         if matches_lab_det:
-            best_match = max(matches_lab_det,key=itemgetter(1)) # retrieve entry with max iou in case of multiple candidates   
+            # retrieve entry with max iou in case of multiple candidates
+            best_match = max(matches_lab_det, key=itemgetter(1))
             ious.append(best_match[0])
             center_devs.append(best_match[1:])
 
