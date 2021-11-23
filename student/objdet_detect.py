@@ -244,19 +244,17 @@ def detect_objects(input_bev_maps, model, configs):
         # loop over all detections
         for obj in detections:
             # perform the conversion using the limits for x, y and z set in the configs structure
-            _, bev_x, bev_y, _z, bbox_bev_height, bbox_bev_width, bbox_bev_length, yaw = obj
+            _, bev_x, bev_y, z, bbox_bev_height, bbox_bev_width, bbox_bev_length, yaw = obj
 
             img_x = bev_y / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
             img_y = bev_x / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0]) - (
                         configs.lim_y[1] - configs.lim_y[0]) / 2.0
-            z = _z - configs.lim_z[0]
             bbox_img_width = bbox_bev_width / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0])
             bbox_img_length = bbox_bev_length / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
-            if ((x >= configs.lim_x[0]) and (x <= configs.lim_x[1])
-                    and (y >= configs.lim_y[0]) and (y <= configs.lim_y[1])
+            if ((img_x >= configs.lim_x[0]) and (img_x <= configs.lim_x[1])
+                    and (img_y >= configs.lim_y[0]) and (img_y <= configs.lim_y[1])
                     and (z >= configs.lim_z[0]) and (z <= configs.lim_z[1])):
                 # append the current object to the 'objects' array
                 objects.append([1, img_x, img_y, z, bbox_bev_height, bbox_img_width, bbox_img_length, yaw])
-
     return objects
 
