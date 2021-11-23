@@ -198,7 +198,7 @@ def detect_objects(input_bev_maps, model, configs):
     configs (edict): dictionary containing object and model-related parameters
 
     Returns:
-    objects ():
+    objects (list): detected bounding boxes in image coordinates [id, x, y, z, height, width, length, yaw]
 
     """
 
