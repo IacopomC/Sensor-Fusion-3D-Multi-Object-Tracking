@@ -69,7 +69,7 @@ class Filter:
         covariance_matrix (numpy matrix): process noise matrix Q
         """
 
-        covariance_matrix = np.zeros(params.dim_state)
+        covariance_matrix = np.zeros((params.dim_state, params.dim_state))
         covariance_matrix[0, 0] = covariance_matrix[1, 1] = covariance_matrix[2, 2] = (params.dt ** 4) / 4
         covariance_matrix[0, 3] = covariance_matrix[1, 4] = covariance_matrix[2, 5] = (params.dt ** 3) / 2
         covariance_matrix[3, 0] = covariance_matrix[4, 1] = covariance_matrix[5, 2] = (params.dt ** 3) / 2
