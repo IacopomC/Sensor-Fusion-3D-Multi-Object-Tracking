@@ -119,6 +119,7 @@ class Filter:
 
         # define covariance of residual
         S = self.S(track, meas, meas.sensor.get_H(track.x))
+
         # calculate Kalman Gain
         K = track.P * H.transpose() * S.I
 
