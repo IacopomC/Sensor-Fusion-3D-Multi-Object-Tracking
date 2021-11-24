@@ -112,15 +112,15 @@ class Filter:
         None
         """
         # define measurement function (jacobian)
-        H = meas.sensor.get_H()
+        H = meas.sensor.get_H(track.x)
 
         # define residual gamma
         gamma = self.gamma(track, meas)
 
         # define covariance of residual
-        S = self.S(track, meas, meas.sensor.get_H())
+        S = self.S(track, meas, meas.sensor.get_H(track.x))
         # calculate Kalman Gain
-        K = track.P * H.transpose() * S.inverse()
+        K = track.P * H.transpose() * S.I
 
         # update current state using measurement information
         x = track.x + (K * gamma)
