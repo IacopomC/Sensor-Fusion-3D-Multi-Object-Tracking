@@ -87,8 +87,8 @@ class Association:
         None
 
         Returns:
-        update_track ():
-        update_meas ():
+        update_track (int): index of track closest to measurement
+        update_meas (int): index of measurement closest to track
         """
 
         # find column and row index minimum entry in association matrix
