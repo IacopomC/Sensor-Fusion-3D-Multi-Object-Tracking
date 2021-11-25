@@ -13,11 +13,11 @@
 # general parameters
 dim_state = 6  # process model dimension
 
-# Kalman filter parameters (Step 1)
+# Kalman filter parameters
 dt = 0.1  # time increment
 q = 3  # process noise variable for Kalman filter Q
 
-# track management parameters (Step 2)
+# track management parameters
 confirmed_threshold = 0.8  # track score threshold to switch from 'tentative' to 'confirmed'
 delete_threshold = 0.6  # track score threshold to delete confirmed tracks
 window = 6  # number of frames for track score calculation
@@ -27,10 +27,10 @@ sigma_p55 = 50  # initial setting for estimation error covariance P entry for vy
 sigma_p66 = 5  # initial setting for estimation error covariance P entry for vz
 weight_dim = 0.1  # sliding average parameter for dimension estimation
 
-# association parameters (Step 3)
+# association parameters
 gating_threshold = 0.995  # percentage of correct measurements that shall lie inside gate
 
-# measurement parameters (Step 4)
+# measurement parameters
 sigma_lidar_x = 0.1  # measurement noise standard deviation for lidar x position
 sigma_lidar_y = 0.1  # measurement noise standard deviation for lidar y position
 sigma_lidar_z = 0.1  # measurement noise standard deviation for lidar z position
