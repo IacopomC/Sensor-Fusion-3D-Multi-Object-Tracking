@@ -13,47 +13,72 @@
 # imports
 import numpy as np
 from scipy.stats.distributions import chi2
+import misc.params as params
 
 # add project directory to python path to enable relative imports
 import os
 import sys
+
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-import misc.params as params 
 
 class Association:
-    '''Data association class with single nearest neighbor association and gating based on Mahalanobis distance'''
+    """
+    Data association class with single nearest neighbor association and gating based on Mahalanobis distance
+    """
     def __init__(self):
         self.association_matrix = np.matrix([])
         self.unassigned_tracks = []
         self.unassigned_meas = []
         
     def associate(self, track_list, meas_list, KF):
-             
-        ############
-        # TODO Step 3: association:
-        # - replace association_matrix with the actual association matrix based on Mahalanobis distance (see below) for all tracks and all measurements
-        # - update list of unassigned measurements and unassigned tracks
-        ############
-        
-        # the following only works for at most one track and one measurement
-        self.association_matrix = np.matrix([]) # reset matrix
-        self.unassigned_tracks = [] # reset lists
+        """
+        Create association matrix between each track and measurement based on Mahalanobis distance and
+        update list of unassigned measurements and unassigned tracks
+
+        Parameters:
+        track_list (list): set of tracks to pair with measurements
+        meas_list (list): set of measurements to pair with potential tracks
+        KF (Filter): Kalman Filter object used in the Mahalanobis distance
+
+        Returns:
+        None
+
+        """
+
+        self.association_matrix = np.matrix([])  # reset matrix
+        self.unassigned_tracks = []  # reset lists
         self.unassigned_meas = []
-        
+        track_meas_matrix = []  # initialize empty temporary association matrix
+
+        # Update list of unassigned measurements and unassigned tracks
         if len(meas_list) > 0:
-            self.unassigned_meas = [0]
+            self.unassigned_meas = np.arange(len(meas_list)).tolist()
         if len(track_list) > 0:
-            self.unassigned_tracks = [0]
-        if len(meas_list) > 0 and len(track_list) > 0: 
-            self.association_matrix = np.matrix([[0]])
-        
-        ############
-        # END student code
-        ############ 
-                
+            self.unassigned_tracks = np.arange(len(track_list)).tolist()
+
+        # check that there are tracks and measurements
+        if len(meas_list) > 0 and len(track_list) > 0:
+            # iterate over track list
+            for track in track_list:
+                # for each track define an empty list to store distances from each measurement
+                dists = []
+                # iterate over each measurement
+                for meas in meas_list:
+                    # compute Mahalanobis distance
+                    mh_dist = self.MHD(track, meas, KF)
+                    # check if measurement lies inside gate
+                    if self.gating(mh_dist, meas.sensor):
+                        dists.append(mh_dist)
+                    else:
+                        # set distance as infinite
+                        dists.append(np.inf)
+                track_meas_matrix.append(dists)
+
+            self.association_matrix = np.matrix(track_meas_matrix)
+
     def get_closest_track_and_meas(self):
         ############
         # TODO Step 3: find closest track and measurement:
@@ -77,7 +102,7 @@ class Association:
         ############ 
         return update_track, update_meas     
 
-    def gating(self, MHD, sensor): 
+    def gating(self, MHD, sensor):
         ############
         # TODO Step 3: return True if measurement lies inside gate, otherwise False
         ############
@@ -89,15 +114,21 @@ class Association:
         ############ 
         
     def MHD(self, track, meas, KF):
-        ############
-        # TODO Step 3: calculate and return Mahalanobis distance
-        ############
-        
-        pass
-        
-        ############
-        # END student code
-        ############ 
+        """
+        Calculate Mahalanobis distance between track and measurement
+
+        Parameters:
+        track (Track):
+        meas (Measurement):
+        KF (Filter): Kalman Filter object
+
+        Returns:
+        mahalanobis ():
+        """
+        y = KF.gamma(track, meas)
+        S = KF.S(track, meas, meas.sensor.get_H(track.x))
+
+        return np.sqrt(y.transpose() * S.I * y)
     
     def associate_and_update(self, manager, meas_list, KF):
         # associate measurements and tracks
