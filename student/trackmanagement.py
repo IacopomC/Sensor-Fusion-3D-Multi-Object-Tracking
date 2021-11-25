@@ -13,6 +13,7 @@
 # imports
 import numpy as np
 import collections
+import misc.params as params
 
 # add project directory to python path to enable relative imports
 import os
@@ -20,46 +21,52 @@ import sys
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
-import misc.params as params 
+
 
 class Track:
-    '''Track class with state, covariance, id, score'''
+    """
+    Track class with state, covariance, id, score
+    """
+
     def __init__(self, meas, id):
         print('creating track no.', id)
-        M_rot = meas.sensor.sens_to_veh[0:3, 0:3] # rotation matrix from sensor to vehicle coordinates
+        M_rot = meas.sensor.sens_to_veh[0:3, 0:3]  # rotation matrix from sensor to vehicle coordinates
         
         ############
-        # TODO Step 2: initialization:
-        # - replace fixed track initialization values by initialization of x and P based on 
-        # unassigned measurement transformed from sensor to vehicle coordinates
-        # - initialize track state and track score with appropriate values
+        # Initialize x and P based on unassigned measurement transformed from sensor to vehicle coordinates
         ############
 
-        self.x = np.matrix([[49.53980697],
-                        [ 3.41006279],
-                        [ 0.91790581],
-                        [ 0.        ],
-                        [ 0.        ],
-                        [ 0.        ]])
-        self.P = np.matrix([[9.0e-02, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 9.0e-02, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 6.4e-03, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+01]])
-        self.state = 'confirmed'
-        self.score = 0
-        
-        ############
-        # END student code
-        ############ 
-               
+        # initialize state vector x with zeros
+        self.x = np.zeros((params.dim_state, 1))
+
+        # transform measurement values from sensor to vehicle coordinates
+        z = np.ones((4, 1))  # transform into homogenous coordinates to apply coord transform
+        z[0:3] = meas.z[:3]
+        z = meas.sensor.sens_to_veh * z
+
+        # initialize position part state vector with measurement values
+        self.x[:3] = z[0:3]
+
+        # initialize covariance error matrix P with zeros
+        self.P = np.zeros((params.dim_state, params.dim_state))
+
+        # fill position covariance error part using measurement error R (convert from sensor to vehicle coordinates)
+        self.P[0:3, 0:3] = M_rot * meas.R * M_rot.transpose()
+
+        # fill velocity covariance error part using lidar parameters
+        self.P[3:, 3:] = np.diag([params.sigma_lidar_x**2, params.sigma_lidar_y**2, params.sigma_lidar_z**2])
+
+        self.state = 'initialized'
+        self.score = 1./params.window
+
         # other track attributes
         self.id = id
         self.width = meas.width
         self.length = meas.length
         self.height = meas.height
-        self.yaw =  np.arccos(M_rot[0,0]*np.cos(meas.yaw) + M_rot[0,1]*np.sin(meas.yaw)) # transform rotation from sensor to vehicle coordinates
+
+        # transform rotation from sensor to vehicle coordinates
+        self.yaw = np.arccos(M_rot[0, 0]*np.cos(meas.yaw) + M_rot[0, 1]*np.sin(meas.yaw))
         self.t = meas.t
 
     def set_x(self, x):
@@ -79,13 +86,16 @@ class Track:
             self.length = c*meas.length + (1 - c)*self.length
             self.height = c*meas.height + (1 - c)*self.height
             M_rot = meas.sensor.sens_to_veh
-            self.yaw = np.arccos(M_rot[0,0]*np.cos(meas.yaw) + M_rot[0,1]*np.sin(meas.yaw)) # transform rotation from sensor to vehicle coordinates
-        
-        
-###################        
+
+            # transform rotation from sensor to vehicle coordinates
+            self.yaw = np.arccos(M_rot[0, 0]*np.cos(meas.yaw) + M_rot[0, 1]*np.sin(meas.yaw))
+
 
 class Trackmanagement:
-    '''Track manager with logic for initializing and deleting objects'''
+    """
+    Track manager with logic for initializing and deleting objects
+    """
+
     def __init__(self):
         self.N = 0 # current number of tracks
         self.track_list = []
