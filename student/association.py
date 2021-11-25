@@ -103,15 +103,19 @@ class Association:
         return update_track, update_meas     
 
     def gating(self, MHD, sensor):
-        ############
-        # TODO Step 3: return True if measurement lies inside gate, otherwise False
-        ############
-        
-        pass    
-        
-        ############
-        # END student code
-        ############ 
+        """"
+        Check if measurement is close track using chi square and mahalanobis distance
+        Ref https://stackoverflow.com/questions/65468026/norm-ppf-vs-norm-cdf-in-pythons-scipy-stats
+
+        Parameters:
+        MHD ():
+        sensor (Sensor):
+
+        Returns:
+        boolean: True if measurement lies inside gate, otherwise False
+        """
+
+        return MHD < chi2.ppf(params.gating_threshold, df=2)
         
     def MHD(self, track, meas, KF):
         """
