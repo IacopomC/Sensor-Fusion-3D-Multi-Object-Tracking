@@ -106,7 +106,7 @@ class Trackmanagement:
         """"
         Implement track management:
         1. Decrease the track score for unassigned tracks
-        2. Delete tracks if the score is too low
+        2. Delete tracks if the score is too low or covariance of px or py are too big
         3. Initialize new track with unassigned measurement
 
         Parameters:
@@ -130,7 +130,7 @@ class Trackmanagement:
 
         # delete old tracks
         for track in self.track_list:
-            if track.score <= params.delete_threshold:
+            if track.score <= params.delete_threshold and (track.P[0, 0] >= params.max_P or track.P[1, 1] >= params.max_P):
                 self.delete_track(track)
 
         # initialize new track with unassigned measurement
