@@ -97,34 +97,42 @@ class Trackmanagement:
     """
 
     def __init__(self):
-        self.N = 0 # current number of tracks
+        self.N = 0  # current number of tracks
         self.track_list = []
         self.last_id = -1
         self.result_list = []
         
-    def manage_tracks(self, unassigned_tracks, unassigned_meas, meas_list):  
-        ############
-        # TODO Step 2: implement track management:
-        # - decrease the track score for unassigned tracks
-        # - delete tracks if the score is too low or P is too big (check params.py for parameters that might be helpful, but
-        # feel free to define your own parameters)
-        ############
-        
+    def manage_tracks(self, unassigned_tracks, unassigned_meas, meas_list):
+        """"
+        Implement track management:
+        1. Decrease the track score for unassigned tracks
+        2. Delete tracks if the score is too low
+        3. Initialize new track with unassigned measurement
+
+        Parameters:
+        unassigned_tracks ():
+        unassigned_meas ():
+        meas_list ():
+
+        Returns:
+        None
+
+        """
+
         # decrease score for unassigned tracks
         for i in unassigned_tracks:
             track = self.track_list[i]
             # check visibility    
-            if meas_list: # if not empty
+            if meas_list:  # if not empty
                 if meas_list[0].sensor.in_fov(track.x):
-                    # your code goes here
-                    pass 
+                    track.state = 'tentative'
+                    track.score -= 1./params.window
 
-        # delete old tracks   
+        # delete old tracks
+        for track in self.track_list:
+            if track.score <= params.delete_threshold:
+                self.delete_track(track)
 
-        ############
-        # END student code
-        ############ 
-            
         # initialize new track with unassigned measurement
         for j in unassigned_meas: 
             if meas_list[j].sensor.name == 'lidar': # only initialize with lidar measurements
@@ -143,15 +151,22 @@ class Trackmanagement:
         print('deleting track no.', track.id)
         self.track_list.remove(track)
         
-    def handle_updated_track(self, track):      
-        ############
-        # TODO Step 2: implement track management for updated tracks:
-        # - increase track score
-        # - set track state to 'tentative' or 'confirmed'
-        ############
+    def handle_updated_track(self, track):
+        """
+        Implement track management for updated tracks:
+        1. Increase track score
+        2. Set track state to 'tentative' or 'confirmed'
 
-        pass
-        
-        ############
-        # END student code
-        ############ 
+        Parameters:
+        track (Track):
+
+        Returns:
+        None
+
+        """
+
+        track.score += 1./params.window
+        if track.score > params.confirmed_threshold:
+            track.state = 'confirmed'
+        else:
+            track.state = 'tentative'
