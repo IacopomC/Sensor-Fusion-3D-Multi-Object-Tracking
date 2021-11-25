@@ -80,27 +80,32 @@ class Association:
             self.association_matrix = np.matrix(track_meas_matrix)
 
     def get_closest_track_and_meas(self):
-        ############
-        # TODO Step 3: find closest track and measurement:
-        # - find minimum entry in association matrix
-        # - delete row and column
-        # - remove corresponding track and measurement from unassigned_tracks and unassigned_meas
-        # - return this track and measurement
-        ############
+        """
+        Find closest association between track and measurement
 
-        # the following only works for at most one track and one measurement
-        update_track = 0
-        update_meas = 0
-        
-        # remove from list
-        self.unassigned_tracks.remove(update_track) 
+        Parameters:
+        None
+
+        Returns:
+        update_track ():
+        update_meas ():
+        """
+
+        # find column and row index minimum entry in association matrix
+        ind_track, ind_meas = np.unravel_index(self.association_matrix.argmin(), self.association_matrix.shape)
+
+        # delete row and column
+        self.association_matrix = np.delete(self.association_matrix, ind_track, axis=0)
+        self.association_matrix = np.delete(self.association_matrix, ind_meas, axis=1)
+
+        # remove corresponding track and measurement from unassigned_tracks and unassigned_meas
+        update_track = self.unassigned_tracks[ind_track]
+        update_meas = self.unassigned_meas[ind_meas]
+
+        self.unassigned_tracks.remove(update_track)
         self.unassigned_meas.remove(update_meas)
-        self.association_matrix = np.matrix([])
-            
-        ############
-        # END student code
-        ############ 
-        return update_track, update_meas     
+
+        return update_track, update_meas
 
     def gating(self, MHD, sensor):
         """"
@@ -139,7 +144,7 @@ class Association:
         self.associate(manager.track_list, meas_list, KF)
     
         # update associated tracks with measurements
-        while self.association_matrix.shape[0]>0 and self.association_matrix.shape[1]>0:
+        while self.association_matrix.shape[0] > 0 and self.association_matrix.shape[1] > 0:
             
             # search for next association between a track and a measurement
             ind_track, ind_meas = self.get_closest_track_and_meas()
