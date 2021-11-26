@@ -202,7 +202,7 @@ def bev_from_pcl(lidar_pcl, configs):
     # assign the height value of each unique entry in lidar_top_pcl to the height map
     # normalize each entry on the difference between the upper and lower height defined in the config file
     height_map[np.int_(lidar_pcl_top[:, 0]), np.int_(lidar_pcl_top[:, 1])] = \
-        (lidar_pcl_top[:, 2] - configs.lim_z[0]) / (configs.lim_z[1] - configs.lim_z[0])
+        lidar_pcl_top[:, 2] / (configs.lim_z[1] - configs.lim_z[0])
 
     # Visualize the height map
     # height_img = height_map * 255
