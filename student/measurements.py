@@ -11,6 +11,8 @@
 #
 
 # imports
+import math
+
 import numpy as np
 import misc.params as params
 
@@ -48,17 +50,27 @@ class Sensor:
         self.veh_to_sens = np.linalg.inv(self.sens_to_veh)  # transformation vehicle to sensor coordinates
     
     def in_fov(self, x):
-        # check if an object x can be seen by this sensor
-        ############
-        # TODO Step 4: implement a function that returns True if x lies in the sensor's field of view, 
-        # otherwise False.
-        ############
+        """"
+        Check if an object can be seen by the sensor
 
-        return True
-        
-        ############
-        # END student code
-        ############ 
+        Parameters:
+        x ():
+
+        Returns
+        boolean: True if x lies in the sensor's field of view, False otherwise
+        """
+
+        # conver x into homogenous coordinate
+        x_hom = np.ones((4,1))
+        x_hom[:3] = x[:3]
+
+        # apply vehicle to sensor coordinate system transformation
+        x_sens = self.veh_to_sens * x_hom
+
+        # compute angle from x value
+        angle = math.atan2(x_sens[1], x_sens[0])
+
+        return self.fov[0] <= angle <= self.fov[1]
              
     def get_hx(self, x):    
         # calculate nonlinear measurement expectation value h(x)   
