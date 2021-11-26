@@ -11,6 +11,8 @@
 #
 
 # imports
+import math
+
 import numpy as np
 from scipy.stats.distributions import chi2
 import misc.params as params
@@ -140,7 +142,7 @@ class Association:
         y = KF.gamma(track, meas)
         S = KF.S(track, meas, meas.sensor.get_H(track.x))
 
-        return np.sqrt(y.transpose() * S.I * y)
+        return math.sqrt(y.transpose() * S.I * y)
     
     def associate_and_update(self, manager, meas_list, KF):
         # associate measurements and tracks
