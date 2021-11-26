@@ -72,28 +72,42 @@ class Sensor:
 
         return self.fov[0] <= angle <= self.fov[1]
              
-    def get_hx(self, x):    
-        # calculate nonlinear measurement expectation value h(x)   
-        if self.name == 'lidar':
-            pos_veh = np.ones((4, 1)) # homogeneous coordinates
-            pos_veh[0:3] = x[0:3] 
-            pos_sens = self.veh_to_sens*pos_veh # transform from vehicle to lidar coordinates
-            return pos_sens[0:3]
-        elif self.name == 'camera':
-            
-            ############
-            # TODO Step 4: implement nonlinear camera measurement function h:
-            # - transform position estimate from vehicle to camera coordinates
-            # - project from camera to image coordinates
-            # - make sure to not divide by zero, raise an error if needed
-            # - return h(x)
-            ############
+    def get_hx(self, x):
+        """
+        Calculate non-linear measurement function h(x)
 
-            pass
-        
-            ############
-            # END student code
-            ############ 
+        Parameters:
+        x (): position estimate
+
+        Returns:
+        h_x (): non-linear measurement function to calculate
+        """
+        if self.name == 'lidar':
+
+            pos_veh = np.ones((4, 1))  # homogeneous coordinates
+            pos_veh[0:3] = x[0:3] 
+            pos_sens = self.veh_to_sens*pos_veh  # transform from vehicle to lidar coordinates
+            return pos_sens[0:3]
+
+        elif self.name == 'camera':
+
+            # transform position estimate from vehicle to camera coordinates
+            pos_veh = np.ones((4, 1))  # homogeneous coordinates
+            pos_veh[0:3] = x[0:3]
+            pos_sens = self.veh_to_sens * pos_veh  # transform from vehicle to camera coordinates
+
+            # initialize h_x
+            h_x = np.zeros((2, 1))
+
+            # project from camera to image coordinates
+            # make sure to not divide by zero, raise an error if needed
+            try:
+                h_x[0, 0] = self.c_i - self.f_i * pos_sens[1] / pos_sens[0]
+                h_x[1, 0] = self.c_j - self.f_j * pos_sens[2] / pos_sens[0]
+            except ZeroDivisionError:
+                h_x = np.array([-100, -100])  # point at infinity
+
+            return h_x
         
     def get_H(self, x):
         # calculate Jacobian H at current x from h(x)
