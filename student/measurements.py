@@ -196,13 +196,11 @@ class Measurement:
             self.yaw = z[6]
 
         elif sensor.name == 'camera':
+            self.z = np.zeros((sensor.dim_meas, 1))  # measurement vector
+            self.z[0] = z[0]
+            self.z[1] = z[1]
+            self.R = np.matrix([[params.sigma_cam_i ** 2, 0],  # measurement noise covariance matrix
+                                [0, params.sigma_cam_j ** 2]])
+            self.width = z[2]
+            self.length = z[3]
 
-            ############
-            # TODO Step 4: initialize camera measurement including z and R 
-            ############
-
-            pass
-
-            ############
-            # END student code
-            ############
