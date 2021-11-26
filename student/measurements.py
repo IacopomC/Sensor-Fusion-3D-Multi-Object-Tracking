@@ -149,19 +149,22 @@ class Sensor:
         return H
 
     def generate_measurement(self, num_frame, z, meas_list):
-        # generate new measurement from this sensor and add to measurement list
-        ############
-        # TODO Step 4: remove restriction to lidar in order to include camera as well
-        ############
+        """
+        Generate new measurement from this sensor and add to measurement list
 
-        if self.name == 'lidar':
-            meas = Measurement(num_frame, z, self)
-            meas_list.append(meas)
+        Parameters:
+        num_frame (int): current frame number
+        z (Measurement): measurement
+        meas_list (list): measurement list before adding the new measurement
+
+        Returns:
+        meas_list (list): measurement list including the new measurement
+
+        """
+        meas = Measurement(num_frame, z, self)
+        meas_list.append(meas)
+
         return meas_list
-
-        ############
-        # END student code
-        ############ 
 
 
 ################### 
