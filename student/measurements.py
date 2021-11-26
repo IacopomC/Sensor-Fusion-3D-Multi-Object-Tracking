@@ -62,15 +62,12 @@ class Sensor:
         boolean: True if x lies in the sensor's field of view, False otherwise
         """
 
-        # conver x into homogenous coordinate
-        x_hom = np.ones((4, 1))
-        x_hom[:3] = x[:3]
-
-        # apply vehicle to sensor coordinate system transformation
-        x_sens = self.veh_to_sens * x_hom
+        pos_veh = np.ones((4, 1))  # homogeneous coordinates
+        pos_veh[0:3] = x[0:3]
+        pos_sens = self.veh_to_sens * pos_veh  # transform from vehicle to lidar coordinates
 
         # compute angle from x value
-        angle = math.atan2(x_sens[1], x_sens[0])
+        angle = math.atan2(pos_sens[1], pos_sens[0])
 
         return self.fov[0] <= angle <= self.fov[1]
 
