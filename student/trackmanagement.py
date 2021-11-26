@@ -36,15 +36,13 @@ class Track:
         # Initialize x and P based on unassigned measurement transformed from sensor to vehicle coordinates
         ############
 
-        # initialize state vector x with zeros
-        self.x = np.zeros((params.dim_state, 1))
-
         # transform measurement values from sensor to vehicle coordinates
         z = np.ones((4, 1))  # transform into homogenous coordinates to apply coord transform
         z[0:3] = meas.z[:3]
         z = meas.sensor.sens_to_veh * z
 
         # initialize position part state vector with measurement values
+        self.x = np.zeros((params.dim_state, 1))
         self.x[:3] = z[0:3]
 
         # initialize covariance error matrix P with zeros
@@ -54,7 +52,7 @@ class Track:
         self.P[0:3, 0:3] = M_rot * meas.R * M_rot.transpose()
 
         # fill velocity covariance error part using lidar parameters
-        self.P[3:, 3:] = np.diag([params.sigma_lidar_x**2, params.sigma_lidar_y**2, params.sigma_lidar_z**2])
+        self.P[3:, 3:] = np.diag([params.sigma_p44**2, params.sigma_p55**2, params.sigma_p66**2])
 
         self.state = 'initialized'
         self.score = 1./params.window
@@ -82,13 +80,13 @@ class Track:
         # use exponential sliding average to estimate dimensions and orientation
         if meas.sensor.name == 'lidar':
             c = params.weight_dim
-            self.width = c*meas.width + (1 - c)*self.width
-            self.length = c*meas.length + (1 - c)*self.length
-            self.height = c*meas.height + (1 - c)*self.height
+            self.width = c * meas.width + (1 - c) * self.width
+            self.length = c * meas.length + (1 - c) * self.length
+            self.height = c * meas.height + (1 - c) * self.height
             M_rot = meas.sensor.sens_to_veh
 
             # transform rotation from sensor to vehicle coordinates
-            self.yaw = np.arccos(M_rot[0, 0]*np.cos(meas.yaw) + M_rot[0, 1]*np.sin(meas.yaw))
+            self.yaw = np.arccos(M_rot[0, 0] * np.cos(meas.yaw) + M_rot[0, 1] * np.sin(meas.yaw))
 
 
 class Trackmanagement:
