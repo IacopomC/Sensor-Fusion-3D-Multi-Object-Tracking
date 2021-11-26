@@ -119,8 +119,8 @@ class Association:
         Returns:
         boolean: True if measurement lies inside gate, otherwise False
         """
-
-        return MHD < chi2.ppf(params.gating_threshold, df=2)
+        df = sensor.dim_meas - 1
+        return MHD < chi2.ppf(params.gating_threshold, df=df)
         
     def MHD(self, track, meas, KF):
         """
