@@ -90,6 +90,9 @@ class Association:
         update_track (int): index of track closest to measurement
         update_meas (int): index of measurement closest to track
         """
+        # If minimum is infinite return values not found
+        if np.min(self.association_matrix) == np.inf:
+            return np.nan, np.nan
 
         # find column and row index minimum entry in association matrix
         ind_track, ind_meas = np.unravel_index(self.association_matrix.argmin(), self.association_matrix.shape)
