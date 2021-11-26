@@ -18,6 +18,9 @@ from easydict import EasyDict as edict
 # add project directory to python path to enable relative imports
 import os
 import sys
+
+from tools.objdet_models.resnet.utils.torch_utils import _sigmoid
+
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
@@ -232,6 +235,9 @@ def detect_objects(input_bev_maps, model, configs):
 
         elif 'fpn_resnet' in configs.arch:
             # decode output and perform post-processing
+
+            outputs['hm_cen'] = _sigmoid(outputs['hm_cen'])
+            outputs['cen_offset'] = _sigmoid(outputs['cen_offset'])
             detections = decode(outputs['hm_cen'], outputs['cen_offset'],
                                 outputs['direction'], outputs['z_coor'], outputs['dim'], K=configs.k)
             detections = detections.cpu().numpy().astype(np.float32)
