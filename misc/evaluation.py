@@ -195,7 +195,8 @@ def plot_rmse(manager, all_labels, configs_det):
                 error = 0
                 if valid: 
                     # check if label lies inside specified range
-                    if label.box.center_x > configs_det.lim_x[0] and label.box.center_x < configs_det.lim_x[1] and label.box.center_y > configs_det.lim_y[0] and label.box.center_y < configs_det.lim_y[1]:
+                    if configs_det.lim_x[0] < label.box.center_x < configs_det.lim_x[1] \
+                            and configs_det.lim_y[0] < label.box.center_y < configs_det.lim_y[1]:
                         error += (label.box.center_x - float(track.x[0]))**2
                         error += (label.box.center_y - float(track.x[1]))**2
                         error += (label.box.center_z - float(track.x[2]))**2
