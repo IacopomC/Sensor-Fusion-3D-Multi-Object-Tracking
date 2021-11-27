@@ -47,7 +47,7 @@ def load_configs_model(model_name='darknet', configs=None):
     """
 
     # init config file, if none has been passed
-    if configs==None:
+    if configs == None:
         configs = edict()
 
     # get parent directory of this file to enable relative paths
@@ -82,7 +82,7 @@ def load_configs_model(model_name='darknet', configs=None):
         configs.num_workers = 1
         configs.pin_memory = True
 
-        configs.num_layers = 18 # https://arxiv.org/pdf/2001.03343.pdf
+        configs.num_layers = 18  # https://arxiv.org/pdf/2001.03343.pdf
 
         configs.saved_fn = 'fpn_resnet'
         configs.k = 50
@@ -113,7 +113,7 @@ def load_configs_model(model_name='darknet', configs=None):
     configs.min_iou = 0.5
 
     # GPU vs. CPU
-    configs.no_cuda = True # if true, cuda is not used
+    configs.no_cuda = True  # if true, cuda is not used
     configs.gpu_idx = 0  # GPU index to use.
     configs.device = torch.device('cpu' if configs.no_cuda else 'cuda:{}'.format(configs.gpu_idx))
 
@@ -133,14 +133,14 @@ def load_configs(model_name='fpn_resnet', configs=None):
     """
 
     # init config file, if none has been passed
-    if configs==None:
+    if configs == None:
         configs = edict()
 
     # birds-eye view (bev) parameters
-    configs.lim_x = [0, 50] # detection range in m
+    configs.lim_x = [0, 50]  # detection range in m
     configs.lim_y = [-25, 25]
     configs.lim_z = [-1, 3]
-    configs.lim_r = [0, 1.0] # reflected lidar intensity
+    configs.lim_r = [0, 1.0]  # reflected lidar intensity
     configs.bev_width = 608  # pixel resolution of bev image
     configs.bev_height = 608
 
@@ -148,8 +148,8 @@ def load_configs(model_name='fpn_resnet', configs=None):
     configs = load_configs_model(model_name, configs)
 
     # visualization parameters
-    configs.output_width = 608 # width of result image (height may vary)
-    configs.obj_colors = [[0, 255, 255], [0, 0, 255], [255, 0, 0]] # 'Pedestrian': 0, 'Car': 1, 'Cyclist': 2
+    configs.output_width = 608  # width of result image (height may vary)
+    configs.obj_colors = [[0, 255, 255], [0, 0, 255], [255, 0, 0]]  # 'Pedestrian': 0, 'Car': 1, 'Cyclist': 2
 
     return configs
 
@@ -207,7 +207,6 @@ def detect_objects(input_bev_maps, model, configs):
 
     """
 
-
     ##################
     # Decode model output and perform post-processing
     ##################
@@ -256,7 +255,7 @@ def detect_objects(input_bev_maps, model, configs):
 
             img_x = bev_y / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
             img_y = bev_x / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0]) - (
-                        configs.lim_y[1] - configs.lim_y[0]) / 2.0
+                    configs.lim_y[1] - configs.lim_y[0]) / 2.0
             bbox_img_width = bbox_bev_width / configs.bev_width * (configs.lim_y[1] - configs.lim_y[0])
             bbox_img_length = bbox_bev_length / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
             if (configs.lim_x[0] <= img_x <= configs.lim_x[1]
@@ -266,4 +265,3 @@ def detect_objects(input_bev_maps, model, configs):
                 objects.append([1, img_x, img_y, z, bbox_bev_height, bbox_img_width, bbox_img_length, yaw])
 
     return objects
-
