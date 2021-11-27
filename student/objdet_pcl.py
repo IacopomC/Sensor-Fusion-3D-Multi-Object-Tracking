@@ -127,7 +127,7 @@ def bev_from_pcl(lidar_pcl, configs):
     configs (edict): dictionary containing config info
 
     Returns:
-    input_bev_maps (tensor): final bird eye view map of cpoint cloud from density, intensity and height layers
+    input_bev_maps (tensor): final bird eye view map of point cloud from density, intensity and height layers
 
     """
 
