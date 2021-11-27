@@ -195,7 +195,7 @@ def create_model(configs):
 
 def detect_objects(input_bev_maps, model, configs):
     """"
-    Detect trained objects in birds-eye view
+    Detect trained objects in birds-eye view and converts bounding boxes from BEV into vehicle space
 
     Parameters:
     input_bev_maps (tensor): bird eye view map of point cloud to feed to the model
@@ -250,7 +250,7 @@ def detect_objects(input_bev_maps, model, configs):
     if len(detections) > 0:
         # loop over all detections
         for obj in detections:
-            # perform the conversion using the limits for x, y and z set in the configs structure
+            # convert from BEV into vehicle space using the limits for x, y and z set in the configs structure
             _, bev_x, bev_y, z, bbox_bev_height, bbox_bev_width, bbox_bev_length, yaw = obj
 
             img_x = bev_y / configs.bev_height * (configs.lim_x[1] - configs.lim_x[0])
