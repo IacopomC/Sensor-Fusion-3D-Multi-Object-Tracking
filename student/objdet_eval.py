@@ -70,12 +70,12 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
                 # extract the four corners of the current detection
                 det_bbox = tools.compute_box_corners(det[1], det[2], det[5], det[6], det[7])  # x, y, w, l, y
 
-                # computer the center distance between label and detection bounding-box in x, y, and z
+                # compute the center distance between label and detection bounding-box in x, y, and z
                 dist_x = box.center_x - det[1]
                 dist_y = box.center_y - det[2]
                 dist_z = box.center_z - det[3]
                 
-                # compute the intersection over union (IOU) between label and detection bounding-box
+                # compute the intersection over union (IOU) between label and detected bounding-box
                 # https://codereview.stackexchange.com/questions/204017/intersection-over-union-for-rotated-rectangles
                 label_pol = Polygon(label_bbox)
                 det_pol = Polygon(det_bbox)
