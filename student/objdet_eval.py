@@ -63,7 +63,7 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
             # extract the four corners of the current label bounding-box
             box = label.box
             label_bbox = tools.compute_box_corners(box.center_x, box.center_y, box.width, box.length, box.heading)
-            
+
             # loop over all detected objects
             for det in detections:
 
@@ -74,18 +74,18 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
                 dist_x = box.center_x - det[1]
                 dist_y = box.center_y - det[2]
                 dist_z = box.center_z - det[3]
-                
+
                 # compute the intersection over union (IOU) between label and detected bounding-box
                 # https://codereview.stackexchange.com/questions/204017/intersection-over-union-for-rotated-rectangles
                 label_pol = Polygon(label_bbox)
                 det_pol = Polygon(det_bbox)
 
                 iou = label_pol.intersection(det_pol).area / label_pol.union(det_pol).area
-                
+
                 # if IOU > min_iou, store [iou,dist_x, dist_y, dist_z] in matches_lab_det
                 if iou >= min_iou:
                     matches_lab_det.append([iou, dist_x, dist_y, dist_z])
-            
+
         # find best match and compute metrics
         if matches_lab_det:
             # retrieve entry with max iou in case of multiple candidates
@@ -111,7 +111,7 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
 
     pos_negs = [all_positives, true_positives, false_negatives, false_positives]
     det_performance = [ious, center_devs, pos_negs]
-    
+
     return det_performance
 
 
@@ -146,7 +146,7 @@ def compute_performance_stats(det_performance_all):
     # compute recall
     recall = true_positives / (true_positives + false_negatives)
 
-    print('precision = ' + str(precision) + ", recall = " + str(recall))   
+    print('precision = ' + str(precision) + ", recall = " + str(recall))
 
     # serialize intersection-over-union and deviations in x,y,z
     ious_all = [element for tupl in ious for element in tupl]
@@ -159,7 +159,7 @@ def compute_performance_stats(det_performance_all):
             devs_x_all.append(dev_x)
             devs_y_all.append(dev_y)
             devs_z_all.append(dev_z)
-    
+
 
     # compute statistics
     stdev__ious = np.std(ious_all)
@@ -195,4 +195,3 @@ def compute_performance_stats(det_performance_all):
                     verticalalignment='top', bbox=props)
     plt.tight_layout()
     plt.show()
-
