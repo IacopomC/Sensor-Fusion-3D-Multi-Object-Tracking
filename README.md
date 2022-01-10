@@ -1,5 +1,5 @@
 
-# **3D Multi-Object Tracking**
+# **SDCND : Sensor Fusion and Tracking**
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
 This is my implementation of the opensource project for the course in the  [Udacity Self-Driving Car Engineer Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213) : Sensor Fusion and Tracking.
